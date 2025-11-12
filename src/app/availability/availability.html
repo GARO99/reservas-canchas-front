@@ -1,0 +1,59 @@
+<section class="availability-filter">
+  <h2>Busca tu disponibilidad</h2>
+  <div class="filter-row">
+    <mat-form-field appearance="fill">
+      <mat-label>Ciudad</mat-label>
+      <mat-select [(ngModel)]="selectedCity">
+        @for (city of cities; track city) {
+          <mat-option [value]="city">{{ city }}</mat-option>
+        } @empty {
+          <mat-option disabled>No hay ciudades</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Sede</mat-label>
+      <mat-select [(ngModel)]="selectedVenue">
+        @for (venue of venues; track venue) {
+          <mat-option [value]="venue">{{ venue }}</mat-option>
+        } @empty {
+          <mat-option disabled>No hay sedes</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Fecha</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="date" [min]="minDate" placeholder="Selecciona fecha">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="accent" (click)="search()">Buscar</button>
+  </div>
+</section>
+
+<section class="availability-results">
+  <h3>Resultados</h3>
+  <mat-grid-list cols="3" rowHeight="100px" gutterSize="12px">
+    @for (slot of slots; track slot.field) {
+      <mat-grid-tile>
+        <mat-card class="slot-card {{ slot.status | lowercase }}">
+          <mat-card-content>
+            <p><strong>{{ slot.field }}</strong></p>
+            <p>{{ slot.time }}</p>
+            <p>Status: {{ slot.status }}</p>
+            @if (slot.status === 'Libre') {
+              <button mat-button color="primary">Reservar</button>
+            }
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    } @empty {
+      <mat-grid-tile colspan="3">
+        <p>No hay franjas disponibles para la fecha seleccionada.</p>
+      </mat-grid-tile>
+    }
+  </mat-grid-list>
+</section>

@@ -1,0 +1,30 @@
+<section class="hero">
+  <div class="hero-content">
+    <h1>Reserva tu cancha de fútbol fácilmente</h1>
+    <p>Consulta horarios, elige tu cancha y reserva al instante.</p>
+    <button mat-raised-button color="accent" routerLink="/availability">
+      Ver Disponibilidad
+    </button>
+  </div>
+</section>
+<section class="features">
+  <mat-grid-list cols="3" rowHeight="160px" gutterSize="16px">
+    @for (item of features; track item.title) {
+      <mat-grid-tile>
+        <mat-card>
+          <mat-card-header>
+          <mat-icon>{{ item.icon }}</mat-icon>
+          <mat-card-title>{{ item.title }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+          <p>{{ item.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    } @empty {
+      <mat-grid-tile colspan="3">
+        <p>No features available.</p>
+      </mat-grid-tile>
+    }
+  </mat-grid-list>
+</section>

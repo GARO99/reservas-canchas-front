@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  padding: 24px 16px;
+}
+
+.bookings-list {
+  h2 {
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .status-chip {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    &.confirmada {
+      background-color: var(--color-state-free);
+      color: white;
+    }
+    &.pendiente {
+      background-color: var(--color-accent);
+      color: white;
+    }
+    &.cancelada {
+      background-color: var(--color-state-occupied);
+      color: white;
+    }
+  }
+}

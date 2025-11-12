@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.hero {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 80px 16px;
+  text-align: center;
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+  p {
+    font-size: 1.125rem;
+    margin-bottom: 24px;
+  }
+}
+.features {
+  padding: 40px 16px;
+  mat-grid-list {
+    @media (max-width: 768px) {
+      cols: 1 !important;
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      cols: 2 !important;
+    }
+  }
+  mat-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    mat-icon {
+      font-size: 40px;
+      margin-right: 8px;
+    }
+  }
+}
