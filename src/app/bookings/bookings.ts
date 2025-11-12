@@ -4,14 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
-
-interface Booking {
-  id: string;
-  date: string;
-  time: string;
-  field: string;
-  status: 'Confirmada' | 'Pendiente' | 'Cancelada';
-}
+import { BookingsService, Booking } from './bookings.service';
 
 @Component({
   selector: 'app-bookings',
@@ -26,35 +19,22 @@ interface Booking {
   styleUrl: './bookings.scss',
 })
 export class Bookings {
-bookings: Booking[] = [
-    {
-      id: 'b1',
-      date: '2025-12-01',
-      time: '18:00-19:00',
-      field: 'Cancha 1',
-      status: 'Confirmada'
-    },
-    {
-      id: 'b2',
-      date: '2025-12-05',
-      time: '20:00-21:00',
-      field: 'Cancha 3',
-      status: 'Pendiente'
-    },
-    {
-      id: 'b2',
-      date: '2025-12-05',
-      time: '20:00-21:00',
-      field: 'Cancha 3',
-      status: 'Cancelada'
-    }
-  ];
-
+  bookings: Booking[] = [];
   displayedColumns: string[] = ['date', 'time', 'field', 'status', 'actions'];
 
+  constructor(private bookingsService: BookingsService) {
+    this.loadBookings();
+  }
+
+  loadBookings(): void {
+    this.bookingsService.getBookings().subscribe(bs => {
+      this.bookings = bs;
+    });
+  }
+
   cancelBooking(bookingId: string): void {
-    // por ahora lógica mock
-    alert(`Cancelar reserva ${bookingId}`);
-    // luego actualizamos estado en mock list o retiramos
+    this.bookingsService.cancelBooking(bookingId).subscribe(bs => {
+      this.bookings = bs;
+    });
   }
 }
