@@ -1,1 +1,45 @@
-<p>login works!</p>
+<section class="login-section">
+  <h2>Iniciar Sesión</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com">
+      @if (form.get('email')?.hasError('required')) {
+        <mat-error>
+          El email es obligatorio.
+        </mat-error>
+      }
+      @if (form.get('email')?.hasError('email')) {
+        <mat-error>
+        Ingresa un email válido.
+      </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="password" placeholder="••••••">
+      @if (form.get('password')?.hasError('required')) {
+        <mat-error>
+          La contraseña es obligatoria.
+        </mat-error>
+      }
+      @if (form.get('password')?.hasError('minlength')) {
+        <mat-error>
+          Mínimo 6 caracteres.
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">
+      Entrar
+    </button>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+
+  <p class="to-register">
+    ¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a>
+  </p>
+</section>

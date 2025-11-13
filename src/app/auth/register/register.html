@@ -1,0 +1,65 @@
+<section class="register-section">
+  <h2>Crear Cuenta</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Nombre Completo</mat-label>
+      <input matInput formControlName="fullName" placeholder="Tu nombre">
+
+      @if (form.get('fullName')?.hasError('required') && (form.get('fullName')?.touched || form.get('fullName')?.dirty)) {
+        <mat-error>El nombre completo es obligatorio.</mat-error>
+      }
+
+      @if (form.get('fullName')?.hasError('minlength') && (form.get('fullName')?.touched || form.get('fullName')?.dirty)) {
+        <mat-error>Mínimo 3 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" placeholder="ejemplo@correo.com">
+
+      @if (form.get('email')?.hasError('required') && (form.get('email')?.touched || form.get('email')?.dirty)) {
+        <mat-error>El email es obligatorio.</mat-error>
+      }
+
+      @if (form.get('email')?.hasError('email') && (form.get('email')?.touched || form.get('email')?.dirty)) {
+        <mat-error>Ingresa un email válido.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Teléfono</mat-label>
+      <input matInput type="text" formControlName="phone" placeholder="Opcional">
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="password" placeholder="••••••">
+
+      @if (form.get('password')?.hasError('required') && (form.get('password')?.touched || form.get('password')?.dirty)) {
+        <mat-error>La contraseña es obligatoria.</mat-error>
+      }
+
+      @if (form.get('password')?.hasError('minlength') && (form.get('password')?.touched || form.get('password')?.dirty)) {
+        <mat-error>Mínimo 6 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">
+      Crear cuenta
+    </button>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+
+    @if (successMessage) {
+      <p class="success">{{ successMessage }}</p>
+    }
+  </form>
+
+  <p class="to-login">
+    ¿Ya tienes cuenta? <a routerLink="/auth/login">Iniciar Sesión</a>
+  </p>
+</section>

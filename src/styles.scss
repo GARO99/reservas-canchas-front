@@ -22,7 +22,7 @@ html {
   --color-on-primary: #ffffff;
   --color-accent: #FFB300;
   --color-on-accent: #000000;
-  --color-background: #F4F6F8;
+  --color-background: #eaffec;
   --color-surface: #ffffff;
   --color-text-primary: #212121;
   --color-state-free: #43A047;
@@ -48,7 +48,19 @@ body {
 /* You can add global styles to this file, and also import other style files */
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: var(--color-background); }
+
+.mat-drawer-content {
+  background-color: var(--color-background);
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: white !important;
+}
+
+.mdc-text-field--filled:not(.mdc-text-field--disabled):hover {
+  background-color: #ededed !important;
+}
 
 .mat-toolbar {
   background-color: var(--color-primary) !important;
@@ -58,6 +70,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .btn-primary {
   background-color: var(--color-accent);
   color: var(--color-on-accent);
+}
+
+.mat-mdc-raised-button:not(:disabled):hover {
+  background-color: #ededed !important;
+}
+
+.mat-mdc-raised-button:not(:disabled):active {
+  background-color: #f5f3f3 !important;
+}
+
+.mat-mdc-raised-button:not(:disabled) {
+    color: #000000 !important;
+    background-color: #ffffff !important;
 }
 
 .status-free {

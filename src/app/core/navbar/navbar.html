@@ -3,7 +3,7 @@
           (click)="drawer.toggle()" aria-label="Toggle navigation">
     <mat-icon>menu</mat-icon>
   </button>
-  <span class="logo">🏟️ Reservas de Canchas</span>
+  <span class="logo"> Reservas de Canchas</span>
   <span class="spacer"></span>
   <nav class="nav-links">
     <a mat-button routerLink="/" routerLinkActive="active-link"
@@ -11,7 +11,23 @@
     <a mat-button routerLink="/availability" routerLinkActive="active-link">Disponibilidad</a>
     <a mat-button routerLink="/bookings" routerLinkActive="active-link">Mis Reservas</a>
     <a mat-button routerLink="/admin" routerLinkActive="active-link">Administración</a>
-    <a mat-button routerLink="/auth" routerLinkActive="active-link">Login</a>
+
+    <!-- Aquí cambiamos: nombre como menú -->
+    @if (currentUser$ | async; as user) {
+      <button mat-button class="user-chip" [matMenuTriggerFor]="userMenu">
+        {{ user.fullName }}
+      </button>
+
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item (click)="logout()">
+          Cerrar sesión
+        </button>
+      </mat-menu>
+    } @else {
+      <a mat-button routerLink="/auth" routerLinkActive="active-link">
+        Login
+      </a>
+    }
   </nav>
 </mat-toolbar>
 
@@ -23,9 +39,25 @@
       <a mat-list-item routerLink="/availability" routerLinkActive="active-link" (click)="drawer.close()">Disponibilidad</a>
       <a mat-list-item routerLink="/bookings" routerLinkActive="active-link" (click)="drawer.close()">Mis Reservas</a>
       <a mat-list-item routerLink="/admin" routerLinkActive="active-link" (click)="drawer.close()">Administración</a>
-      <a mat-list-item routerLink="/auth" routerLinkActive="active-link" (click)="drawer.close()">Login</a>
+
+      @if (currentUser$ | async; as user) {
+        <!-- El nombre abre un menú con Cerrar sesión -->
+        <a mat-list-item [matMenuTriggerFor]="userMenuMobile">
+          👤 {{ user.fullName }}
+        </a>
+
+        <mat-menu #userMenuMobile="matMenu">
+          <button mat-menu-item (click)="logout(); drawer.close()">
+            Cerrar sesión
+          </button>
+        </mat-menu>
+      } @else {
+        <a mat-list-item routerLink="/auth" routerLinkActive="active-link"
+           (click)="drawer.close()">Login</a>
+      }
     </nav>
   </mat-sidenav>
+
   <mat-sidenav-content>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
