@@ -22,7 +22,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class Bookings {
   bookings: Booking[] = [];
-  displayedColumns: string[] = ['date', 'time', 'field', 'status', 'actions'];
+  displayedColumns: string[] = ['date', 'time', 'city', 'venue', 'field', 'status', 'actions'];
 
   currentUser: AuthUser | null = null;
 

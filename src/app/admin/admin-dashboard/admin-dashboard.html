@@ -1,1 +1,201 @@
-<p>admin-dashboard works!</p>
+<section class="admin-panel">
+  <h2>Panel de Administración</h2>
+
+  <mat-tab-group>
+    <!-- TAB 1: Inventario -->
+    <mat-tab label="Canchas y sedes">
+      <div class="inventory-filters">
+        <mat-form-field appearance="fill">
+          <mat-label>Ciudad</mat-label>
+          <mat-select [(ngModel)]="selectedCityId" (selectionChange)="onCityChange()">
+            @for (city of cities; track city.id) {
+              <mat-option [value]="city.id">{{ city.name }}</mat-option>
+            } @empty {
+              <mat-option disabled>No hay ciudades</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Sede</mat-label>
+          <mat-select [(ngModel)]="selectedVenueId" (selectionChange)="onVenueChange()">
+            @for (venue of venues; track venue.id) {
+              <mat-option [value]="venue.id">{{ venue.name }}</mat-option>
+            } @empty {
+              <mat-option disabled>No hay sedes</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <table mat-table [dataSource]="fields" class="mat-elevation-z8 full-width-table">
+
+        <!-- Nombre -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Cancha</th>
+          <td mat-cell *matCellDef="let field">{{ field.name }}</td>
+        </ng-container>
+
+        <!-- Tipo -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let field">{{ field.type }}</td>
+        </ng-container>
+
+        <!-- Indoor/Outdoor -->
+        <ng-container matColumnDef="indoor">
+          <th mat-header-cell *matHeaderCellDef>Interior</th>
+          <td mat-cell *matCellDef="let field">
+            {{ field.isIndoor ? 'Cubierta' : 'A cielo abierto' }}
+          </td>
+        </ng-container>
+
+        <!-- Precio -->
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef>Precio/hora</th>
+          <td mat-cell *matCellDef="let field">
+            {{ field.pricePerHour | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </td>
+        </ng-container>
+
+        <!-- Activo -->
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Activo</th>
+          <td mat-cell *matCellDef="let field">
+            <mat-slide-toggle
+              [checked]="field.isActive"
+              (change)="onToggleField(field, $event.checked)">
+              {{ field.isActive ? 'Sí' : 'No' }}
+            </mat-slide-toggle>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['name','type','indoor','price','active']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['name','type','indoor','price','active'];"></tr>
+      </table>
+
+      @if (!fields.length) {
+        <p class="empty-message">No hay canchas para la sede seleccionada.</p>
+      }
+
+      <!-- 🆕 Formularios de creación -->
+      <div class="create-forms">
+        <!-- Crear sede -->
+        <div class="card-form">
+          <h3>Crear nueva sede</h3>
+          <p class="hint">
+            Ciudad seleccionada:
+            <strong>{{ getCityName(selectedCityId) || 'Ninguna' }}</strong>
+          </p>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Nombre de la sede</mat-label>
+            <input matInput [(ngModel)]="newVenueName" placeholder="Ej. Sede Centro">
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <input matInput [(ngModel)]="newVenueAddress" placeholder="Calle, número, etc.">
+          </mat-form-field>
+
+          <button mat-raised-button color="primary"
+                  (click)="createVenue()"
+                  [disabled]="!selectedCityId">
+            Crear sede
+          </button>
+        </div>
+
+        <!-- Crear cancha -->
+        <div class="card-form">
+          <h3>Crear nueva cancha</h3>
+          <p class="hint">
+            Sede seleccionada:
+            <strong>{{ getVenueName(selectedVenueId) || 'Ninguna' }}</strong>
+          </p>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Nombre de la cancha</mat-label>
+            <input matInput [(ngModel)]="newFieldName" placeholder="Ej. Cancha 5">
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Tipo</mat-label>
+            <mat-select [(ngModel)]="newFieldType">
+              <mat-option [value]="'Fútbol 5'">Fútbol 5</mat-option>
+              <mat-option [value]="'Fútbol 7'">Fútbol 7</mat-option>
+              <mat-option [value]="'Fútbol 11'">Fútbol 11</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Precio por hora (COP)</mat-label>
+            <input matInput type="number" [(ngModel)]="newFieldPrice" placeholder="80000">
+          </mat-form-field>
+
+          <div class="toggles-row">
+            <mat-slide-toggle [(ngModel)]="newFieldIndoor">
+              ¿Cancha cubierta?
+            </mat-slide-toggle>
+            <mat-slide-toggle [(ngModel)]="newFieldActive">
+              ¿Activa?
+            </mat-slide-toggle>
+          </div>
+
+          <button mat-raised-button color="primary"
+                  (click)="createField()"
+                  [disabled]="!selectedVenueId">
+            Crear cancha
+          </button>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 2: Todas las reservas -->
+    <mat-tab label="Todas las reservas">
+      <table mat-table [dataSource]="allBookings" class="mat-elevation-z8 full-width-table">
+
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.date }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="time">
+          <th mat-header-cell *matHeaderCellDef>Hora</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.time }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="city">
+          <th mat-header-cell *matHeaderCellDef>Ciudad</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.city }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="venue">
+          <th mat-header-cell *matHeaderCellDef>Sede</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.venue }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="field">
+          <th mat-header-cell *matHeaderCellDef>Cancha</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.field }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="userId">
+          <th mat-header-cell *matHeaderCellDef>Usuario</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.userId }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.status }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="bookingsDisplayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: bookingsDisplayedColumns;"></tr>
+      </table>
+
+      @if (!allBookings.length) {
+        <p class="empty-message">No hay reservas registradas.</p>
+      }
+    </mat-tab>
+  </mat-tab-group>
+</section>

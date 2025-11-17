@@ -9,6 +9,8 @@ export interface Booking {
   userId: string;
   date: string;
   time: string;
+  city: string;
+  venue: string;
   field: string;
   status: BookingStatus;
 }
@@ -23,6 +25,8 @@ export class BookingsService {
       userId: 'u1',
       date: '2025-12-01',
       time: '18:00-19:00',
+      city: 'Bogotá',
+      venue: 'Sede Norte',
       field: 'Cancha 1',
       status: 'Confirmada'
     },
@@ -31,6 +35,8 @@ export class BookingsService {
       userId: 'u1',
       date: '2025-12-05',
       time: '20:00-21:00',
+      city: 'Bogotá',
+      venue: 'Sede Sur',
       field: 'Cancha 3',
       status: 'Pendiente'
     }
@@ -47,6 +53,8 @@ export class BookingsService {
     userId: string;
     date: string;
     time: string;
+    city: string;   // 🆕
+    venue: string;  // 🆕
     field: string;
   }): Observable<Booking> {
     const newBooking: Booking = {
@@ -54,6 +62,8 @@ export class BookingsService {
       userId: params.userId,
       date: params.date,
       time: params.time,
+      city: params.city,
+      venue: params.venue,
       field: params.field,
       status: 'Confirmada'
     };

@@ -14,17 +14,21 @@ export interface RegisterRequest {
   password: string;
 }
 
+export type UserRole = 'user' | 'admin';
+
 export interface AuthResponse {
   token: string;
   userId: string;
   fullName: string;
   email: string;
+  role: UserRole;
 }
 
 export interface AuthUser {
   userId: string;
   fullName: string;
   email: string;
+  role: UserRole;
 }
 
 @Injectable({
@@ -33,14 +37,25 @@ export interface AuthUser {
 export class AuthService {
   private storageKey = 'app_auth_user';
 
-  // usuario simulado para login
-  private readonly _mockUser = {
-    email: 'demo@example.com',
-    password: 'password123',
-    userId: 'u1',
-    fullName: 'Usuario Demo',
-    token: 'mock-token-abc-123'
-  };
+  // Usuarios simulados para login
+  private readonly _mockUsers = [
+    {
+      email: 'demo@example.com',
+      password: 'password123',
+      userId: 'u1',
+      fullName: 'Usuario Demo',
+      token: 'mock-token-user-123',
+      role: 'user' as UserRole
+    },
+    {
+      email: 'admin@example.com',
+      password: 'password123',
+      userId: 'admin1',
+      fullName: 'Admin Demo',
+      token: 'mock-token-admin-456',
+      role: 'admin' as UserRole
+    }
+  ];
 
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.loadFromStorage());
   currentUser$ = this.currentUserSubject.asObservable();
@@ -53,11 +68,16 @@ export class AuthService {
     const raw = localStorage.getItem(this.storageKey);
     if (!raw) return null;
     try {
-      const parsed = JSON.parse(raw) as AuthResponse;
+      const parsed = JSON.parse(raw) as Partial<AuthResponse>;
+      if (!parsed.userId || !parsed.fullName || !parsed.email) {
+        return null;
+      }
+      const role: UserRole = (parsed.role as UserRole) ?? 'user';
       return {
         userId: parsed.userId,
         fullName: parsed.fullName,
-        email: parsed.email
+        email: parsed.email,
+        role
       };
     } catch {
       return null;
@@ -68,7 +88,8 @@ export class AuthService {
     const user: AuthUser = {
       userId: resp.userId,
       fullName: resp.fullName,
-      email: resp.email
+      email: resp.email,
+      role: resp.role
     };
     this.currentUserSubject.next(user);
     if (typeof window !== 'undefined') {
@@ -77,17 +98,20 @@ export class AuthService {
   }
 
   login(req: LoginRequest): Observable<AuthResponse> {
-    const ok = req.email === this._mockUser.email && req.password === this._mockUser.password;
+    const found = this._mockUsers.find(
+      u => u.email === req.email && u.password === req.password
+    );
 
-    if (!ok) {
+    if (!found) {
       return throwError(() => new Error('Credenciales incorrectas'));
     }
 
     const resp: AuthResponse = {
-      token: this._mockUser.token,
-      userId: this._mockUser.userId,
-      fullName: this._mockUser.fullName,
-      email: this._mockUser.email
+      token: found.token,
+      userId: found.userId,
+      fullName: found.fullName,
+      email: found.email,
+      role: found.role
     };
 
     this.saveSession(resp);
@@ -97,14 +121,18 @@ export class AuthService {
   }
 
   register(req: RegisterRequest): Observable<AuthResponse> {
+    // Regla simple: si el email empieza por "admin", es admin; si no, user
+    const role: UserRole = req.email.toLowerCase().startsWith('admin') ? 'admin' : 'user';
+
     const resp: AuthResponse = {
       token: 'mock-token-' + Math.random().toString(36).substring(2, 10),
       userId: 'u' + Math.floor(Math.random() * 10000),
       fullName: req.fullName,
-      email: req.email
+      email: req.email,
+      role
     };
 
-    // Para simplificar, tras registrarse queda logueado
+    // Tras registrarse queda logueado
     this.saveSession(resp);
 
     return of(resp).pipe(delay(500));
@@ -119,5 +147,9 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
+  }
+
+  isAdmin(): boolean {
+    return this.currentUserSubject.value?.role === 'admin';
   }
 }

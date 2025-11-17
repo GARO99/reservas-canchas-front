@@ -108,8 +108,8 @@ export class Availability {
   onReserve(slot: Slot): void {
     if (!this.currentUser) {
       this.snackBar.open('Debes iniciar sesión para reservar.', 'Cerrar', { duration: 3000 });
-      this.router.navigate(['/auth'], {
-        queryParams: { returnUrl: '/availability' },
+      this.router.navigate(['/auth/login'], {
+        queryParams: { returnUrl: '/availability' }
       });
       return;
     }
@@ -121,16 +121,16 @@ export class Availability {
     dialogRef.afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
 
-      this.bookingsService
-        .createBooking({
-          userId: this.currentUser!.userId,
-          date: slot.date,
-          time: slot.time,
-          field: slot.field,
-        })
-        .subscribe(() => {
-          this.snackBar.open('Reserva creada con éxito.', 'Cerrar', { duration: 3000 });
-        });
+      this.bookingsService.createBooking({
+        userId: this.currentUser!.userId,
+        date: slot.date,
+        time: slot.time,
+        city: this.selectedCity,
+        venue: this.selectedVenue,
+        field: slot.field
+      }).subscribe(() => {
+        this.snackBar.open('Reserva creada con éxito.', 'Cerrar', { duration: 3000 });
+      });
     });
   }
 }
