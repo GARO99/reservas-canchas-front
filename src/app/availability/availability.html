@@ -30,13 +30,18 @@
       <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
-    <button mat-raised-button color="accent" (click)="search()">Buscar</button>
+    <button 
+      mat-raised-button
+      color="accent"
+      (click)="search()"
+      [disabled]="!selectedCity || !selectedVenue || !date"
+    >Buscar</button>
   </div>
 </section>
 
 <section class="availability-results">
   <h3>Resultados</h3>
-  <mat-grid-list cols="3" rowHeight="100px" gutterSize="12px">
+  <mat-grid-list cols="3" rowHeight="150px" gutterSize="12px">
     @for (slot of slots; track slot.field) {
       <mat-grid-tile>
         <mat-card class="slot-card {{ slot.status | lowercase }}">
@@ -45,7 +50,7 @@
             <p>{{ slot.time }}</p>
             <p>Status: {{ slot.status }}</p>
             @if (slot.status === 'Libre') {
-              <button mat-button color="primary">Reservar</button>
+              <button mat-button color="primary" (click)="onReserve(slot)">Reservar</button>
             }
           </mat-card-content>
         </mat-card>

@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { BookingsService, Booking } from './bookings.service';
+import { AuthService, AuthUser } from '../auth/auth-service.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-bookings',
@@ -22,19 +24,37 @@ export class Bookings {
   bookings: Booking[] = [];
   displayedColumns: string[] = ['date', 'time', 'field', 'status', 'actions'];
 
-  constructor(private bookingsService: BookingsService) {
-    this.loadBookings();
-  }
+  currentUser: AuthUser | null = null;
 
-  loadBookings(): void {
-    this.bookingsService.getBookings().subscribe(bs => {
-      this.bookings = bs;
+  constructor(
+    private bookingsService: BookingsService,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) { }
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      if (user) {
+        this.loadBookings();
+      } else {
+        this.bookings = [];
+      }
     });
   }
 
+  loadBookings(): void {
+    if (!this.currentUser) return;
+
+    this.bookingsService
+      .getBookings(this.currentUser.userId)
+      .subscribe(list => (this.bookings = list));
+  }
+
   cancelBooking(bookingId: string): void {
-    this.bookingsService.cancelBooking(bookingId).subscribe(bs => {
-      this.bookings = bs;
+     this.bookingsService.cancelBooking(bookingId).subscribe(() => {
+      this.snackBar.open('Reserva cancelada.', 'Cerrar', { duration: 3000 });
+      this.loadBookings();
     });
   }
 }

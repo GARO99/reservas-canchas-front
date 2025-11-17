@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../auth-service.service';
 
 @Component({
@@ -23,15 +23,22 @@ import { AuthService } from '../auth-service.service';
 export class Login {
   form: FormGroup;
   errorMessage: string = '';
+  private returnUrl: string = '/availability';
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.form = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(6)])
     });
+
+    const fromQuery = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (fromQuery) {
+      this.returnUrl = fromQuery;
+    }
   }
 
   onSubmit(): void {
@@ -43,7 +50,7 @@ export class Login {
     this.authService.login({ email, password })
       .subscribe({
         next: () => {
-          this.router.navigate(['/availability']);
+          this.router.navigateByUrl(this.returnUrl);
         },
         error: () => {
           this.errorMessage = 'Credenciales incorrectas.';

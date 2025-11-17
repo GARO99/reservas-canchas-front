@@ -1,44 +1,70 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { delay } from 'rxjs/operators';
+
+export type BookingStatus = 'Confirmada' | 'Pendiente' | 'Cancelada';
 
 export interface Booking {
   id: string;
+  userId: string;
   date: string;
   time: string;
   field: string;
-  status: 'Confirmada' | 'Pendiente' | 'Cancelada';
+  status: BookingStatus;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingsService {
-  // Datos mock iniciales
   private _bookings: Booking[] = [
-    { id: 'b1', date: '2025-12-01', time: '18:00-19:00', field: 'Cancha 1', status: 'Confirmada' },
-    { id: 'b2', date: '2025-12-05', time: '20:00-21:00', field: 'Cancha 3', status: 'Pendiente' }
+    {
+      id: 'b1',
+      userId: 'u1',
+      date: '2025-12-01',
+      time: '18:00-19:00',
+      field: 'Cancha 1',
+      status: 'Confirmada'
+    },
+    {
+      id: 'b2',
+      userId: 'u1',
+      date: '2025-12-05',
+      time: '20:00-21:00',
+      field: 'Cancha 3',
+      status: 'Pendiente'
+    }
   ];
 
-  constructor() { }
-
-  /** Obtiene todas las reservas del usuario (simulado) */
-  getBookings(): Observable<Booking[]> {
-    // Retorna una copia para evitar mutaciones externas
-    return of(this._bookings.map(b => ({ ...b }))).pipe(
-      delay(300) // simula latencia
-    );
+  getBookings(userId?: string): Observable<Booking[]> {
+    const data = userId
+      ? this._bookings.filter(b => b.userId === userId)
+      : this._bookings;
+    return of([...data]).pipe(delay(300));
   }
 
-  /** Cancela una reserva por id (simulado) */
+  createBooking(params: {
+    userId: string;
+    date: string;
+    time: string;
+    field: string;
+  }): Observable<Booking> {
+    const newBooking: Booking = {
+      id: 'b' + Date.now().toString(),
+      userId: params.userId,
+      date: params.date,
+      time: params.time,
+      field: params.field,
+      status: 'Confirmada'
+    };
+    this._bookings.push(newBooking);
+    return of(newBooking).pipe(delay(300));
+  }
+
   cancelBooking(id: string): Observable<Booking[]> {
-    // Cambia el estado a ‘Cancelada’
     this._bookings = this._bookings.map(b =>
       b.id === id ? { ...b, status: 'Cancelada' } : b
     );
-    // Retorna la lista actualizada
-    return of(this._bookings.map(b => ({ ...b }))).pipe(
-      delay(300)
-    );
+    return of([...this._bookings]).pipe(delay(300));
   }
 }

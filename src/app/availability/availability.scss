@@ -35,8 +35,17 @@
     margin-bottom: 16px;
   }
 
+  .slots-grid {
+    width: 100%;
+  }
+
   mat-card.slot-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 16px;
+
     &.libre {
       border-left: 4px solid var(--color-state-free);
     }
@@ -46,14 +55,15 @@
         display: none;
       }
     }
+
     p {
       margin: 4px 0;
     }
   }
 
   @media (max-width: 768px) {
-    mat-grid-list {
-      gap: 8px;
+    .slots-grid {
+      margin-top: 8px;
     }
   }
 }
